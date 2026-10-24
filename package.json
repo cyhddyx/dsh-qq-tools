@@ -1,0 +1,71 @@
+{
+  "name": "dsh-qq-tools",
+  "version": "0.7.0",
+  "description": "给大肥鱼会话用的 QQ 群/私聊工具：列群、看群记录、发群消息、发表情、收藏表情（SnowLuma 收藏夹）、好友/私聊记录、发私聊消息、私聊唤醒、群成员、戳一戳感知/戳回去。8 个工具各是一个独立组件，可在插件页逐个开关。",
+  "type": "module",
+  "main": "lib/index.js",
+  "license": "MIT",
+  "author": "cyhddyx",
+  "homepage": "https://github.com/cyhddyx/dsh-qq-tools#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cyhddyx/dsh-qq-tools.git"
+  },
+  "bugs": {
+    "url": "https://github.com/cyhddyx/dsh-qq-tools/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "qq",
+    "onebot",
+    "snowluma",
+    "napcat"
+  ],
+  "files": [
+    "lib",
+    "tools",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.0 <0.3.0"
+  },
+  "exports": {
+    ".": "./lib/index.js",
+    "./tools/qq-list-groups": "./tools/qq-list-groups/index.js",
+    "./tools/qq-list-groups/locale/en.json": "./tools/qq-list-groups/locale/en.json",
+    "./tools/qq-list-groups/locale/zh.json": "./tools/qq-list-groups/locale/zh.json",
+    "./tools/qq-get-group-history": "./tools/qq-get-group-history/index.js",
+    "./tools/qq-get-group-history/locale/en.json": "./tools/qq-get-group-history/locale/en.json",
+    "./tools/qq-get-group-history/locale/zh.json": "./tools/qq-get-group-history/locale/zh.json",
+    "./tools/qq-get-group-members": "./tools/qq-get-group-members/index.js",
+    "./tools/qq-get-group-members/locale/en.json": "./tools/qq-get-group-members/locale/en.json",
+    "./tools/qq-get-group-members/locale/zh.json": "./tools/qq-get-group-members/locale/zh.json",
+    "./tools/qq-send-group-message": "./tools/qq-send-group-message/index.js",
+    "./tools/qq-send-group-message/locale/en.json": "./tools/qq-send-group-message/locale/en.json",
+    "./tools/qq-send-group-message/locale/zh.json": "./tools/qq-send-group-message/locale/zh.json",
+    "./tools/qq-send-face": "./tools/qq-send-face/index.js",
+    "./tools/qq-send-face/locale/en.json": "./tools/qq-send-face/locale/en.json",
+    "./tools/qq-send-face/locale/zh.json": "./tools/qq-send-face/locale/zh.json",
+    "./tools/qq-favorite-faces": "./tools/qq-favorite-faces/index.js",
+    "./tools/qq-favorite-faces/locale/en.json": "./tools/qq-favorite-faces/locale/en.json",
+    "./tools/qq-favorite-faces/locale/zh.json": "./tools/qq-favorite-faces/locale/zh.json",
+    "./tools/qq-private-chat": "./tools/qq-private-chat/index.js",
+    "./tools/qq-private-chat/locale/en.json": "./tools/qq-private-chat/locale/en.json",
+    "./tools/qq-private-chat/locale/zh.json": "./tools/qq-private-chat/locale/zh.json",
+    "./tools/qq-send-poke": "./tools/qq-send-poke/index.js",
+    "./tools/qq-send-poke/locale/en.json": "./tools/qq-send-poke/locale/en.json",
+    "./tools/qq-send-poke/locale/zh.json": "./tools/qq-send-poke/locale/zh.json",
+    "./package.json": "./package.json"
+  },
+  "description": "给大肥鱼会话用的 QQ 群/私聊工具：列群、看群记录、发群消息、发表情、收藏表情（SnowLuma 收藏夹）、好友/私聊记录、发私聊消息、私聊唤醒、群成员、戳一戳感知/戳回去。8 个工具各是一个独立组件，可在插件页逐个开关。",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

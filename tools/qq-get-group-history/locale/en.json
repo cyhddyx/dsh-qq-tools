@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Group chat history",
+    "description": "Read recent messages and images from a QQ group (read-only, 30 by default, up to 50)."
+  }
+}
