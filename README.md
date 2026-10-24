@@ -102,10 +102,18 @@ dsh plugin --profile <profile> add github:cyhddyx/dsh-qq-tools
 
 本插件是纯 JavaScript，没有构建步骤，所以不需要 `prepare` 脚本，也不需要给 pnpm 加 `allowBuilds` 授权。安装完成后重启 DSH，插件页里应该能看到 8 个组件，每个带开关。
 
-### 从 npm 安装（发布后可用）
+### 从 npm 安装（推荐）
+
+已发布到 npm，装最新版：
 
 ```sh
 dsh plugin --profile <profile> add dsh-qq-tools
+```
+
+需要固定版本时：
+
+```sh
+dsh plugin --profile <profile> add dsh-qq-tools@0.7.0
 ```
 
 ### 本地开发 / 自己改代码
