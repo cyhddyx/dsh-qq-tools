@@ -128,7 +128,7 @@ dsh plugin --profile <profile> add dsh-qq-tools
 需要固定版本时：
 
 ```sh
-dsh plugin --profile <profile> add dsh-qq-tools@0.8.0
+dsh plugin --profile <profile> add dsh-qq-tools@0.8.1
 ```
 
 ### 本地开发 / 自己改代码
@@ -141,7 +141,7 @@ dsh plugin --profile <profile> add link:/path/to/dsh-qq-tools
 
 ```sh
 pnpm pack
-dsh plugin --profile <profile> add ./dsh-qq-tools-0.8.0.tgz
+dsh plugin --profile <profile> add ./dsh-qq-tools-0.8.1.tgz
 ```
 
 `dsh plugin` 会在安装后自动把这个包追加进 profile 的 `dsh.profile.bundles`，不用手改 `package.json`。卸载用：
@@ -155,8 +155,8 @@ dsh plugin --profile <profile> remove dsh-qq-tools
 - DSH 0.2.x（cordis 插件体系）
 - Node.js 22+（内置 `fetch` / `WebSocket`）
 - SnowLuma 提供 OneBot 11 HTTP 接口和 WebSocket 事件（收藏表情需要 SnowLuma；系统表情 NapCat 也能发）
-- 可选：`sharp`（GIF 帧拆分）。会自动使用插件自己装的、`SHARP_PATH` 指定的，或 DSH 宿主自带的 sharp；都找不到时 GIF 按静图处理
+- 可选：`sharp`（GIF 帧拆分、超过 4MiB 的图片缩放、其他格式转码）。会自动使用插件自己装的、`SHARP_PATH` 指定的，或 DSH 宿主自带的 sharp；都找不到时 GIF 按静图处理，大图直接交给 DSH 归一化（DSH 默认单张源图上限 20MiB）。
 
 ---
 
-版本：0.8.0
+版本：0.8.1

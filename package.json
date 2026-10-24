@@ -1,6 +1,6 @@
 {
   "name": "dsh-qq-tools",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "给大肥鱼会话用的 QQ 群/私聊工具：列群、看群记录、发群消息、发表情、收藏表情（SnowLuma 收藏夹）、好友/私聊记录、发私聊消息、私聊唤醒、群成员、戳一戳感知/戳回去、挂载会话选择。8 个工具加 1 个设置组件，可在插件页逐个开关。",
   "type": "module",
   "main": "lib/index.js",
