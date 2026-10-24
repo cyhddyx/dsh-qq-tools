@@ -31,8 +31,7 @@
     "LICENSE"
   ],
   "engines": {
-    "node": ">=22",
-    "dsh": ">=0.2.0 <0.3.0"
+    "node": ">=22"
   },
   "exports": {
     ".": "./lib/index.js",
