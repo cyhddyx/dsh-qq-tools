@@ -99,7 +99,7 @@ tools/qq-send-poke/
 
 私聊和群聊在程序里是分开的两条路径：群聊靠轮询 @，私聊靠 WebSocket 的 `message_type=private` 事件。私聊没有观察窗，每收到一条私聊消息都会直接唤醒目标会话。
 
-- 唤醒提示里会带发送者昵称、QQ 号、`message_id` 和文字；如果消息里有图片，也会把图片一起给模型看（GIF 会拆成首/中/尾最多 3 帧，和群聊记录的处理一致）。
+- 唤醒提示里会带发送者昵称、QQ 号、`message_id` 和文字；如果消息里有图片，也会把图片一起给模型看（有 sharp 时 GIF 会拆成首/中/尾最多 3 帧；没有 sharp 时交给 DSH 显示首帧，和群聊记录的处理一致）。
 - 模型用 `qq_get_private_history` 看和对方的最近记录，用 `qq_send_private_message` 回文字，用 `qq_send_face` 回表情。
 - `qq_list_friends` 列好友，可以按昵称、备注或 QQ 号搜；`privateUsers` 非空时只列白名单里的好友。
 - `qq_get_private_history` 的消息带 `#message_id`，可以传给 `qq_send_private_message` / `qq_send_face` 的 `reply_to` 做引用回复。
@@ -128,7 +128,7 @@ dsh plugin --profile <profile> add dsh-qq-tools
 需要固定版本时：
 
 ```sh
-dsh plugin --profile <profile> add dsh-qq-tools@0.8.1
+dsh plugin --profile <profile> add dsh-qq-tools@0.8.2
 ```
 
 ### 本地开发 / 自己改代码
@@ -141,7 +141,7 @@ dsh plugin --profile <profile> add link:/path/to/dsh-qq-tools
 
 ```sh
 pnpm pack
-dsh plugin --profile <profile> add ./dsh-qq-tools-0.8.1.tgz
+dsh plugin --profile <profile> add ./dsh-qq-tools-0.8.2.tgz
 ```
 
 `dsh plugin` 会在安装后自动把这个包追加进 profile 的 `dsh.profile.bundles`，不用手改 `package.json`。卸载用：
@@ -155,8 +155,8 @@ dsh plugin --profile <profile> remove dsh-qq-tools
 - DSH 0.2.x（cordis 插件体系）
 - Node.js 22+（内置 `fetch` / `WebSocket`）
 - SnowLuma 提供 OneBot 11 HTTP 接口和 WebSocket 事件（收藏表情需要 SnowLuma；系统表情 NapCat 也能发）
-- 可选：`sharp`（GIF 帧拆分、超过 4MiB 的图片缩放、其他格式转码）。会自动使用插件自己装的、`SHARP_PATH` 指定的，或 DSH 宿主自带的 sharp；都找不到时 GIF 按静图处理，大图直接交给 DSH 归一化（DSH 默认单张源图上限 20MiB）。
+- 可选：`sharp`（GIF 拆帧、尺寸被拒时的兜底重编码）。会从 `SHARP_PATH`、插件自己的 `node_modules`、DSH 宿主 runtimeDir（桌面版通过 `process.argv[2]` 传入）等位置自动查找；找不到时 GIF 交给 DSH 显示首帧，大图仍由 DSH 自动归一化（默认单张源图上限 20MiB），图片不会因此丢失。
 
 ---
 
-版本：0.8.1
+版本：0.8.2
