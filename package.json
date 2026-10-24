@@ -1,7 +1,7 @@
 {
   "name": "dsh-qq-tools",
-  "version": "0.7.0",
-  "description": "给大肥鱼会话用的 QQ 群/私聊工具：列群、看群记录、发群消息、发表情、收藏表情（SnowLuma 收藏夹）、好友/私聊记录、发私聊消息、私聊唤醒、群成员、戳一戳感知/戳回去。8 个工具各是一个独立组件，可在插件页逐个开关。",
+  "version": "0.8.0",
+  "description": "给大肥鱼会话用的 QQ 群/私聊工具：列群、看群记录、发群消息、发表情、收藏表情（SnowLuma 收藏夹）、好友/私聊记录、发私聊消息、私聊唤醒、群成员、戳一戳感知/戳回去、挂载会话选择。8 个工具加 1 个设置组件，可在插件页逐个开关。",
   "type": "module",
   "main": "lib/index.js",
   "license": "MIT",
@@ -26,6 +26,7 @@
   "files": [
     "lib",
     "tools",
+    "locale",
     "cordis.patch.yml",
     "README.md",
     "LICENSE"
@@ -35,6 +36,7 @@
   },
   "exports": {
     ".": "./lib/index.js",
+    "./client": "./lib/client.js",
     "./tools/qq-list-groups": "./tools/qq-list-groups/index.js",
     "./tools/qq-list-groups/locale/en.json": "./tools/qq-list-groups/locale/en.json",
     "./tools/qq-list-groups/locale/zh.json": "./tools/qq-list-groups/locale/zh.json",
@@ -59,12 +61,22 @@
     "./tools/qq-send-poke": "./tools/qq-send-poke/index.js",
     "./tools/qq-send-poke/locale/en.json": "./tools/qq-send-poke/locale/en.json",
     "./tools/qq-send-poke/locale/zh.json": "./tools/qq-send-poke/locale/zh.json",
+    "./locale/en.json": "./locale/en.json",
+    "./locale/zh.json": "./locale/zh.json",
     "./package.json": "./package.json"
   },
-  "description": "给大肥鱼会话用的 QQ 群/私聊工具：列群、看群记录、发群消息、发表情、收藏表情（SnowLuma 收藏夹）、好友/私聊记录、发私聊消息、私聊唤醒、群成员、戳一戳感知/戳回去。8 个工具各是一个独立组件，可在插件页逐个开关。",
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-settings",
+        "@deepseek-ai/dsh-client-ui-plugin-manager"
+      ],
+      "platform": "web"
     }
   }
 }

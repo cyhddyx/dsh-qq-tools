@@ -1,10 +1,11 @@
-# DSH 大肥鱼 QQ 群/私聊工具：8 个工具各是一个独立组件，插件页里可以逐个开关
+# DSH 大肥鱼 QQ 群/私聊工具：9 个组件，插件页里可以逐个开关
 #   · 列出 QQ 群 / 看群聊天记录 / 看群成员 —— 只读工具
 #   · 发群消息 —— 同时负责 @ 提醒与群后续轮询
 #   · 发表情 —— 在群里或私聊里发系统表情或 QQ 收藏夹里的自定义表情
 #   · 收藏表情 —— QQ 收藏夹（SnowLuma）：qq_list_faces + qq_favorite_face
 #   · 私聊 —— 好友列表 / 私聊记录 / 发私聊消息，同时负责私聊消息唤醒
 #   · 戳一戳 —— 同时负责接收戳一戳事件
+#   · 挂载会话 —— 插件页里的「配置」页面，选择 QQ 消息唤醒哪个 DSH 会话
 - insert:
     - id: qq-tools-list-groups
       name: 'dsh-qq-tools/tools/qq-list-groups'
@@ -22,3 +23,8 @@
       name: 'dsh-qq-tools/tools/qq-private-chat'
     - id: qq-tools-send-poke
       name: 'dsh-qq-tools/tools/qq-send-poke'
+    # 包根行：DSH 只从包根发现 dsh.client，浏览器半侧和挂载会话接口都挂在这里。
+    - id: qq-tools-root
+      name: 'dsh-qq-tools'
+      config:
+        carrier: true
