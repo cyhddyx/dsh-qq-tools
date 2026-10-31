@@ -189,7 +189,7 @@ dsh plugin --profile <profile> add dsh-qq-tools
 需要固定版本时：
 
 ```sh
-dsh plugin --profile <profile> add dsh-qq-tools@0.9.1
+dsh plugin --profile <profile> add dsh-qq-tools@0.9.2
 ```
 
 ### 本地开发 / 自己改代码
@@ -202,7 +202,7 @@ dsh plugin --profile <profile> add link:/path/to/dsh-qq-tools
 
 ```sh
 pnpm pack
-dsh plugin --profile <profile> add ./dsh-qq-tools-0.9.1.tgz
+dsh plugin --profile <profile> add ./dsh-qq-tools-0.9.2.tgz
 ```
 
 `dsh plugin` 会在安装后自动把这个包追加进 profile 的 `dsh.profile.bundles`，不用手改 `package.json`。卸载用：
@@ -230,4 +230,4 @@ Node.js 要求为 `>=22`，DSH 支持范围为 `0.2.x`，与原有依赖说明�
 
 ---
 
-版本：0.9.1
+版本：0.9.2

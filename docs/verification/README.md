@@ -4,8 +4,9 @@
 
 ## 声明与来源
 
-- 包：`dsh-qq-tools@0.9.1`，MIT；仓库根目录的标准 Bundle，12 个自有入口。
-- 本次源码基线：`1b1579d6fced507cba41293a03bc87c57da394fb`。此为整改前基线，最终修复来源以提交后的完整 Commit 为准。
+- 发布包：`dsh-qq-tools@0.9.2`，MIT；仓库根目录的标准 Bundle，12 个自有入口。
+- 0.9.2 只是把本声明和验收记录打进 Release 附件的版本号变化；运行代码与 0.9.1 相同，下面的安装证据仍来自 0.9.1 包快照。
+- 本次源码基线：`1b1579d6fced507cba41293a03bc87c57da394fb`。此为整改前基线，最终修复来源以默认分支上的完整 Commit 为准。
 - 检查流程：`build-dsh-plugin`，工具来源 Commit `bd5c363264df52d19ce8795f3b105d609a399ffe`。
 - 本机 DSH CLI 版本：`0.2.1-rc.5`，仅用于标识历史验收环境。manifest 的 `dsh.compatibility.dsh` 声明为原有的 `0.2.x` 支持范围，不新增 `engines.dsh` 限制。
 - Node.js 最低版本保持原有的 `>=22`；运行代码使用内置 `fetch` / `WebSocket`。
@@ -41,6 +42,6 @@
 
 ## 下一步与状态
 
-整改需提交并推送到默认分支，商城才会读取新固定 Commit 自动复检。当前尚未发布、未向 DSH STORE 提交或回复 Issue，也未完成独立安全审阅。商城仍可能保留 `blocked`，或经专项审阅采用 `user-reviewed`；补充声明本身不能保证解除拦截。
+整改随 0.9.2 提交并推送到默认分支，GitHub Release 附件也包含本记录；商城会按新的固定 Commit 自动复检。npm 发布仍由维护者单独执行。未向 DSH STORE 提交或回复 Issue，也未完成独立安全审阅。商城仍可能保留 `blocked`，或经专项审阅采用 `user-reviewed`；补充声明本身不能保证解除拦截。
 
 本次不再重复测试功能；用户的手工测试不被写成缺失的安装、启动、卸载或回滚证据。官方 Desktop UI、逐工具回放、真实 QQ 写操作和未测 DSH 版本保持未验证。
