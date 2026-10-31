@@ -9,7 +9,7 @@
 | 列出 QQ 群 | `qq_list_groups` | 群号、群名、人数 |
 | 看群聊天记录 | `qq_get_group_history` | 最近消息 + 图片，只读；消息带 `#message_id` |
 | 看群成员 | `qq_get_group_members` | 昵称、群名片、QQ 号、身份 |
-| 发群消息 | `qq_send_group_message` | 发群消息；同时负责 @ 提醒和群后续轮询 |
+| 发群消息 | `qq_send_group_message` | 发群消息，可引用消息、@人、@全体；同时负责 @ 提醒和群后续轮询 |
 | 发表情 | `qq_send_face` | 在群里或私聊里发系统表情或 QQ 收藏夹里的自定义表情，可带一句话 |
 | 收藏表情 | `qq_list_faces` / `qq_favorite_face` | 看/管理 QQ 账号收藏夹（SnowLuma）：收藏图片、取消收藏、改备注、移到最前 |
 | 私聊 | `qq_list_friends` / `qq_get_private_history` / `qq_send_private_message` | 好友列表、私聊记录、发私聊消息；同时负责私聊消息唤醒 |
@@ -102,12 +102,22 @@ test/smoke.mjs                   离线冒烟测试：假 OneBot HTTP 服务 + �
 
 这些自定义表情接口是 SnowLuma 扩展，NapCat 没有。用 NapCat 时系统表情照常能发，收藏表情工具会提示接口不可用。
 
+## 群消息：引用和 @
+
+`qq_send_group_message` 除了 `group_id` 和 `message`，还支持：
+
+- `reply_to`：消息前面的 `#编号`，引用那条消息；
+- `at_user_ids`：QQ 号数组，@ 这些人；
+- `at_all`：`true` 表示 @全体成员（这时 `at_user_ids` 会被忽略）。
+
+`message` 可以只写文字，也可以留空只发 @；引用和 @ 可以同时用。群 @ 提醒和群后续里的每条消息是 `昵称(QQ号)：内容（消息 #编号）`，可以直接把 `#编号` 传给 `reply_to`，把里面括号中的 QQ 号传给 `at_user_ids`。戳一戳和私聊唤醒也是 `昵称(QQ号)` 的形式。
+
 ## 私聊
 
 私聊和群聊在程序里是分开的两条路径：群聊靠轮询 @，私聊靠 WebSocket 的 `message_type=private` 事件。私聊没有观察窗，每收到一条私聊消息都会直接唤醒目标会话。
 
-- 唤醒提示里会带发送者昵称、QQ 号、`message_id` 和文字；如果消息里有图片，也会把图片一起给模型看（有 sharp 时 GIF 会拆成首/中/尾最多 3 帧；没有 sharp 时交给 DSH 显示首帧，和群聊记录的处理一致）。
-- 模型用 `qq_get_private_history` 看和对方的最近记录，用 `qq_send_private_message` 回文字，用 `qq_send_face` 回表情。
+- 唤醒提示里的消息行是 `昵称(QQ号)：内容（消息 #编号）`；如果消息里有图片，也会把图片一起给模型看（有 sharp 时 GIF 会拆成首/中/尾最多 3 帧；没有 sharp 时交给 DSH 显示首帧，和群聊记录的处理一致）。
+- 模型用 `qq_get_private_history` 看和对方的最近记录，用 `qq_send_private_message` 回文字（传 `reply_to=#编号` 可以引用），用 `qq_send_face` 回表情。
 - `qq_list_friends` 列好友，可以按昵称、备注或 QQ 号搜；`privateUsers` 非空时只列白名单里的好友。
 - `qq_get_private_history` 的消息带 `#message_id`，可以传给 `qq_send_private_message` / `qq_send_face` 的 `reply_to` 做引用回复。
 - 私聊唤醒的 `source.kind` 是 `qq-private`，和群聊的 `qq-mention` / `qq-followup` / `qq-poke` 区分开。
@@ -179,7 +189,7 @@ dsh plugin --profile <profile> add dsh-qq-tools
 需要固定版本时：
 
 ```sh
-dsh plugin --profile <profile> add dsh-qq-tools@0.9.0
+dsh plugin --profile <profile> add dsh-qq-tools@0.9.1
 ```
 
 ### 本地开发 / 自己改代码
@@ -192,7 +202,7 @@ dsh plugin --profile <profile> add link:/path/to/dsh-qq-tools
 
 ```sh
 pnpm pack
-dsh plugin --profile <profile> add ./dsh-qq-tools-0.9.0.tgz
+dsh plugin --profile <profile> add ./dsh-qq-tools-0.9.1.tgz
 ```
 
 `dsh plugin` 会在安装后自动把这个包追加进 profile 的 `dsh.profile.bundles`，不用手改 `package.json`。卸载用：
@@ -212,4 +222,4 @@ dsh plugin --profile <profile> remove dsh-qq-tools
 
 ---
 
-版本：0.9.0
+版本：0.9.1

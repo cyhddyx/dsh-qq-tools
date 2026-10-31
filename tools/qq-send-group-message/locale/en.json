@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Send group message",
-    "description": "Send a message to a QQ group; also polls @ mentions and follow-up chatter."
+    "description": "Send group messages with quotes, @mentions and @all; also polls @ mentions and follow-up chatter."
   }
 }

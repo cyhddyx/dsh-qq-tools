@@ -13,6 +13,8 @@ const calls = []
 const failures = new Set()
 const replies = {
   set_qq_avatar: null,
+  send_group_msg: { message_id: 'gm-1' },
+  send_private_msg: { message_id: 'pm-1' },
   get_stranger_info: {
     user_id: 10001, nickname: '张三', remark: '', sex: 'male', age: 20,
     qid: 'zhangsan', qq_level: 45, is_vip: true, vip_level: 7,
@@ -128,6 +130,13 @@ writeFileSync(join(root, 'qq-tools-config.json'), JSON.stringify({
 }), 'utf8')
 
 const mod = await import(new URL('../lib/shared.js', import.meta.url).href)
+
+// 0. 唤醒提示的消息格式：昵称(QQ号)：内容
+assert.equal(
+  mod.formatIncomingLine('张三', 10001, '你好', 456),
+  '张三(10001)：你好（消息 #456）',
+)
+assert.equal(mod.formatIncomingLine('', 10001, '', null), 'QQ(10001)：（空）')
 
 function last(action) {
   const hit = [...calls].reverse().find((c) => c.action === action)
@@ -294,6 +303,50 @@ const handle = mod.makeHandleFriendRequestTool()
   render(handle, {}, v)
   const after = await requests.execute({ include_doubt: false })
   assert.equal(after.requests.length, 0)
+}
+// 9.6 群消息：引用 + @ 多个（去重）
+const groupSend = mod.makeSendTool()
+{
+  const v = await groupSend.execute({
+    group_id: 123456, message: '收到', reply_to: '99', at_user_ids: [10001, 10002, 10001],
+  })
+  assert.equal(v.ok, true, JSON.stringify(v))
+  assert.deepEqual(last('send_group_msg'), {
+    group_id: 123456,
+    message: [
+      { type: 'reply', data: { id: '99' } },
+      { type: 'at', data: { qq: '10001' } },
+      { type: 'at', data: { qq: '10002' } },
+      { type: 'text', data: { text: '收到' } },
+    ],
+  })
+  assert.deepEqual(v.at_user_ids, [10001, 10002])
+  render(groupSend, {}, v)
+}
+// 9.7 @全体，且只 @ 不说话
+{
+  const v = await groupSend.execute({ group_id: 123456, message: '', at_all: true })
+  assert.equal(v.ok, true, JSON.stringify(v))
+  assert.deepEqual(last('send_group_msg').message, [{ type: 'at', data: { qq: 'all' } }])
+  render(groupSend, {}, v)
+  const bad = await groupSend.execute({ group_id: 123456, message: '' })
+  assert.equal(bad.ok, false)
+  assert.match(bad.error, /消息是空的/)
+}
+// 9.8 私聊引用
+const privateSend = mod.makeSendPrivateTool()
+{
+  const v = await privateSend.execute({ user_id: 10001, message: '收到', reply_to: '88' })
+  assert.equal(v.ok, true, JSON.stringify(v))
+  assert.deepEqual(last('send_private_msg'), {
+    user_id: 10001,
+    message: [
+      { type: 'reply', data: { id: '88' } },
+      { type: 'text', data: { text: '收到' } },
+    ],
+  })
+  assert.equal(v.reply_to, '88')
+  render(privateSend, {}, v)
 }
 // 10. 说说列表
 const listQzone = mod.makeListQzoneTool(undefined)

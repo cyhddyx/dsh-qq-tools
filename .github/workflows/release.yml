@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check that the tag matches package.json
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json version $version"
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - name: Build the tarball
+        run: |
+          mkdir -p dist
+          npm pack --pack-destination dist
+
+      - name: Build the release notes
+        run: |
+          prev=$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)
+          if [ -n "$prev" ]; then range="$prev..$GITHUB_REF_NAME"; else range="$GITHUB_REF_NAME"; fi
+
+          cat > notes.md <<'EOF'
+          QQ group/private chat tools for DSH (OneBot 11 / SnowLuma).
+
+          ## Install
+
+          From npm:
+          ```sh
+          dsh plugin --profile <profile> add dsh-qq-tools
+          ```
+
+          From GitHub:
+          ```sh
+          dsh plugin --profile <profile> add github:cyhddyx/dsh-qq-tools
+          ```
+
+          Or use the attached tarball:
+          ```sh
+          dsh plugin --profile <profile> add ./dsh-qq-tools-__VERSION__.tgz
+          ```
+
+          ## What's changed
+
+          EOF
+
+          sed -i "s/__VERSION__/$VERSION/g" notes.md
+
+          changes=$(git log --no-merges --format='- %s' "$range" | sed -E 's/^- [0-9]+\.[0-9]+\.[0-9]+: /- /')
+          if [ -z "$changes" ]; then changes="- Maintenance release."; fi
+          printf '%s\n' "$changes" >> notes.md
+
+          cat notes.md
+
+      - name: Create the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "release $GITHUB_REF_NAME already exists, skipping"
+            exit 0
+          fi
+          gh release create "$GITHUB_REF_NAME" dist/*.tgz \
+            --title "dsh-qq-tools $VERSION" \
+            --notes-file notes.md \
+            --verify-tag
