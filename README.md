@@ -211,6 +211,14 @@ dsh plugin --profile <profile> add ./dsh-qq-tools-0.9.1.tgz
 dsh plugin --profile <profile> remove dsh-qq-tools
 ```
 
+## 兼容性、权限与商城状态
+
+Node.js 要求为 `>=22`，DSH 支持范围为 `0.2.x`，与原有依赖说明一致。机器可读版本范围声明位于 `package.json` 的 `dsh.compatibility`。
+
+本次声明依据、已获得的安装证据及未验证项见 [整改记录](docs/verification/README.md)。用户已自行测试现有功能；本次不重复功能测试，也不将手工使用情况冒充完整的商城生命周期验收。
+
+本插件需要文件、网络和 OneBot token 权限。配置/诊断日志、本地图片读取、外部服务、账号写操作及失败边界详见 [SECURITY.md](SECURITY.md)。这些能力是 QQ 桥接的实际需要；补齐声明和验收证据不保证 DSH STORE 自动批准，商城可能仍要求 `user-reviewed` 专项审阅或保持 `blocked`。本仓库的验收记录不构成独立安全审计。
+
 ## 依赖
 
 - DSH 0.2.x（cordis 插件体系）

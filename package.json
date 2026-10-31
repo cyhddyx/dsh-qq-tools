@@ -29,6 +29,8 @@
     "locale",
     "cordis.patch.yml",
     "README.md",
+    "SECURITY.md",
+    "docs/verification",
     "LICENSE"
   ],
   "engines": {
@@ -78,6 +80,10 @@
     "./package.json": "./package.json"
   },
   "dsh": {
+    "compatibility": {
+      "dsh": "0.2.x",
+      "node": ">=22"
+    },
     "bundle": {
       "patch": "./cordis.patch.yml"
     },
