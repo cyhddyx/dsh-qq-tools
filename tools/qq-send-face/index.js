@@ -1,4 +1,7 @@
-import { admitImagesFor, makeSendFaceTool, mountOneTool, startObservation } from '../../lib/shared.js'
+import { admitImagesFor } from '../../lib/images.js'
+import { makeSendFaceTool } from '../../lib/tools/faces.js'
+import { mountOneTool } from '../../lib/session.js'
+import { startObservation } from '../../lib/observation.js'
 
 export const name = 'qq-tools-send-face'
 export const inject = ['agents', 'timer', 'tools', 'attachments']

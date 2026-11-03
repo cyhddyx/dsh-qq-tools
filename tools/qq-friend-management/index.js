@@ -6,9 +6,9 @@ import {
   makeListFriendRequestsTool,
   makeSendLikeTool,
   makeUpdateFriendTool,
-  mountOneTool,
   startFriendRequestWatcher,
-} from '../../lib/shared.js'
+} from '../../lib/tools/friends.js'
+import { mountOneTool } from '../../lib/session.js'
 
 export const name = 'qq-tools-friend-management'
 export const inject = ['agents', 'timer', 'tools']

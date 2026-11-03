@@ -1,11 +1,7 @@
-import {
-  admitImagesFor,
-  makeListFriendsTool,
-  makePrivateHistoryTool,
-  makeSendPrivateTool,
-  mountOneTool,
-  startPrivateWatcher,
-} from '../../lib/shared.js'
+import { admitImagesFor } from '../../lib/images.js'
+import { makeListFriendsTool, makePrivateHistoryTool, makeSendPrivateTool } from '../../lib/tools/private.js'
+import { mountOneTool } from '../../lib/session.js'
+import { startPrivateWatcher } from '../../lib/watchers/private.js'
 
 export const name = 'qq-tools-private-chat'
 export const inject = ['agents', 'timer', 'tools', 'attachments']

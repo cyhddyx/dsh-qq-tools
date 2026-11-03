@@ -1,4 +1,5 @@
-import { makeListTool, mountOneTool } from '../../lib/shared.js'
+import { makeListTool } from '../../lib/tools/groups.js'
+import { mountOneTool } from '../../lib/session.js'
 
 export const name = 'qq-tools-list-groups'
 export const inject = ['agents', 'timer', 'tools']

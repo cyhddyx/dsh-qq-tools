@@ -1,4 +1,5 @@
-import { makeListFacesTool, makeFavoriteFaceTool, mountOneTool } from '../../lib/shared.js'
+import { makeListFacesTool, makeFavoriteFaceTool } from '../../lib/tools/faces.js'
+import { mountOneTool } from '../../lib/session.js'
 
 export const name = 'qq-tools-favorite-faces'
 export const inject = ['agents', 'timer', 'tools']

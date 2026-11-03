@@ -25,7 +25,17 @@
 
 ```
 cordis.patch.yml                 12 个组件行
-lib/shared.js                    共享核心：配置、SnowLuma 接口、挂载、@ 轮询、私聊唤醒、戳一戳、表情、头像、好友管理、QQ 空间、观察窗
+lib/config.js                    配置读写、群/私聊白名单
+lib/onebot.js                    SnowLuma HTTP 接口
+lib/qq-state.js                  登录号 / 群名缓存
+lib/session.js                   目标会话、工具挂载、挂载会话接口
+lib/observation.js               观察窗
+lib/images.js                    sharp、图片准入、GIF 拆帧、取图
+lib/prompts.js                   唤醒提示词与回复风格
+lib/tools/                       按域拆开的工具工厂（groups/private/faces/avatar/poke/friends/qzone）
+lib/watchers/                    @ 轮询、戳一戳、私聊唤醒、通用 WS
+lib/mount-all.js                 旧的全量入口
+lib/shared.js                    兼容 barrel：re-export 上面所有模块，保持旧 import 路径可用
 lib/client.js                    浏览器半侧：插件页里的挂载会话下拉框
 lib/index.js                     包根 carrier（承载浏览器半侧和挂载会话接口），也是旧的全量入口
 locale/                          包根行在插件页显示的标题和说明

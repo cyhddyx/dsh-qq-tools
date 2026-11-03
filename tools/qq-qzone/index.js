@@ -1,11 +1,11 @@
+import { admitImagesFor } from '../../lib/images.js'
 import {
-  admitImagesFor,
   makeGetQzonePostTool,
   makeListQzoneTool,
   makeManageQzoneTool,
   makeSendQzonePostTool,
-  mountOneTool,
-} from '../../lib/shared.js'
+} from '../../lib/tools/qzone.js'
+import { mountOneTool } from '../../lib/session.js'
 
 export const name = 'qq-tools-qzone'
 export const inject = ['agents', 'timer', 'tools', 'attachments']

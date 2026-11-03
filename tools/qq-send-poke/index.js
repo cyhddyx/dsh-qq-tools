@@ -1,4 +1,7 @@
-import { makePokeTool, mountOneTool, startObservation, startPokeWatcher } from '../../lib/shared.js'
+import { makePokeTool } from '../../lib/tools/poke.js'
+import { mountOneTool } from '../../lib/session.js'
+import { startObservation } from '../../lib/observation.js'
+import { startPokeWatcher } from '../../lib/watchers/poke.js'
 
 export const name = 'qq-tools-send-poke'
 export const inject = ['agents', 'timer', 'tools']
