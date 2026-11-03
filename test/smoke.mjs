@@ -52,6 +52,11 @@ const replies = {
   },
   add_custom_face: { emoji_id: 'emoji-new' },
   modify_custom_face: null,
+  fetch_custom_face_detail: [
+    { emoji_id: 'e1', desc: '笑死', url: 'https://example.com/e1.jpg' },
+    { emoji_id: 'e2', desc: '', url: 'https://example.com/e2.jpg' },
+  ],
+  send_custom_face: { message_id: 'cf-1' },
   get_qzone_msg_list: {
     total: 2,
     msglist: [
@@ -173,6 +178,47 @@ const avatar = mod.makeSetAvatarTool()
   assert.equal(last('add_custom_face').file, 'https://example.com/a.jpg')
   assert.deepEqual(last('modify_custom_face'), { emoji_id: 'emoji-new', desc: '新表情' })
   render(fav, {}, v)
+}
+// 2.6 收藏表情只看文本备注，不取预览图、不掺系统表情
+{
+  const list = mod.makeListFacesTool()
+  const v = await list.execute({})
+  assert.equal(v.ok, true, JSON.stringify(v))
+  assert.equal(v.favorites_total, 2)
+  assert.deepEqual(v.favorites[0], { emoji_id: 'e1', desc: '笑死' })
+  assert.equal(v.images, undefined)
+  assert.equal(v.sys_faces, undefined)
+  render(list, {}, v)
+  const q = await list.execute({ query: '笑死' })
+  assert.equal(q.favorites.length, 1)
+  assert.equal(q.favorites[0].emoji_id, 'e1')
+}
+// 2.7 发表情只走收藏表情：face_id 不再可用；preview 只出图不发送
+{
+  const face = mod.makeSendFaceTool(undefined, async (list) => list.map((x) => ({
+    caption: x.caption,
+    block: { type: 'image', data: 'x', mediaType: 'image/png' },
+  })))
+  const before = calls.filter((c) => c.action === 'send_custom_face').length
+  const p = await face.execute({ group_id: 123, emoji_id: 'e1', preview: true })
+  assert.equal(p.ok, true, JSON.stringify(p))
+  assert.equal(p.preview, true)
+  assert.equal(p.images.length, 1)
+  assert.equal(calls.filter((c) => c.action === 'send_custom_face').length, before)
+  const blocks = face.render({}, p)
+  assert.equal(blocks.filter((b) => b.type === 'image').length, 1)
+  const miss = await face.execute({ group_id: 123, emoji_id: 'nope', preview: true })
+  assert.equal(miss.ok, false)
+  const sys = await face.execute({ group_id: 123, face_id: 14 })
+  assert.equal(sys.ok, false)
+  assert.match(sys.error, /emoji_id/)
+  const v = await face.execute({ group_id: 123, emoji_id: 'e1', text: '哈哈' })
+  assert.equal(v.ok, true, JSON.stringify(v))
+  assert.deepEqual(last('send_group_msg').message, [{ type: 'text', data: { text: '哈哈' } }])
+  const body = last('send_custom_face')
+  assert.equal(body.emoji_id, 'e1')
+  assert.equal(body.group_id, 123)
+  render(face, {}, v)
 }
 // 3. 好友资料
 const friendInfo = mod.makeGetFriendInfoTool()

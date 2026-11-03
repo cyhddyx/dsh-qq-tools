@@ -1,6 +1,6 @@
 # dsh-qq-tools
 
-给 DSH（DeepSeek Harness）里的大肥鱼会话用的 QQ 群/私聊工具，走 OneBot 11 HTTP + WebSocket。系统表情在 SnowLuma / NapCat 上都能发；收藏表情、更改头像、好友管理和 QQ 空间走 SnowLuma 的扩展接口，和 QQ 客户端里的数据是同一份。
+给 DSH（DeepSeek Harness）里的大肥鱼会话用的 QQ 群/私聊工具，走 OneBot 11 HTTP + WebSocket。发表情只发 QQ 收藏夹里的自定义表情；收藏表情、更改头像、好友管理和 QQ 空间走 SnowLuma 的扩展接口，和 QQ 客户端里的数据是同一份。
 
 11 个工具组各自是一个独立的 cordis 组件，外加一个负责选择挂载会话的设置组件，在 DSH 插件页的「包含的组件」里可以逐个开关：
 
@@ -10,8 +10,8 @@
 | 看群聊天记录 | `qq_get_group_history` | 最近消息 + 图片，只读；消息带 `#message_id` |
 | 看群成员 | `qq_get_group_members` | 昵称、群名片、QQ 号、身份 |
 | 发群消息 | `qq_send_group_message` | 发群消息，可引用消息、@人、@全体；同时负责 @ 提醒和群后续轮询 |
-| 发表情 | `qq_send_face` | 在群里或私聊里发系统表情或 QQ 收藏夹里的自定义表情，可带一句话 |
-| 收藏表情 | `qq_list_faces` / `qq_favorite_face` | 看/管理 QQ 账号收藏夹（SnowLuma）：收藏图片、取消收藏、改备注、移到最前 |
+| 发表情 | `qq_send_face` | 在群里或私聊里发 QQ 收藏夹里的自定义表情，可带一句话 |
+| 收藏表情 | `qq_list_faces` / `qq_favorite_face` | 看收藏夹的 `emoji_id` 和文字备注、收藏图片、取消收藏、改备注、移到最前（SnowLuma） |
 | 私聊 | `qq_list_friends` / `qq_get_private_history` / `qq_send_private_message` | 好友列表、私聊记录、发私聊消息；同时负责私聊消息唤醒 |
 | 戳一戳 | `qq_send_poke` | 戳人；同时负责接收戳一戳事件 |
 | 更改头像 | `qq_set_avatar` | 换自己的 QQ 头像：链接、本机文件，或从聊天记录里取图 |
@@ -90,8 +90,8 @@ test/smoke.mjs                   离线冒烟测试：假 OneBot HTTP 服务 + �
 
 发表情和收藏表情都走 SnowLuma 的扩展接口，收藏夹和 QQ 客户端里的是同一份数据。
 
-- `qq_list_faces`：列 QQ 收藏夹（`emoji_id` + 备注），默认给 3 张不同位置的预览图；想看指定表情就传 `preview`（列表序号或 `emoji_id`，最多 6 张）。传 `query` 时用 SnowLuma 的 `search_sys_faces` 按名字/别名/编号搜系统表情，搜不到再退回内置的常用表情表。
-- `qq_send_face`：`face_id` 发系统表情（OneBot 11 的 `face` 段，SnowLuma 会自动选 classic / small / super 编码）；`emoji_id` 发收藏表情（`send_custom_face`）。两者二选一；带 `text` 时系统表情和文字同一条发出，收藏表情则先发文字再发图。群聊传 `group_id`，私聊传 `user_id`（可选 `group_id` 表示临时会话来源群）。
+- `qq_list_faces`：列 QQ 收藏夹，每个只返回 `emoji_id` 和文字备注，不发预览图；传 `query` 按备注或 `emoji_id` 过滤，`count` 默认 200、最多 500。
+- `qq_send_face`：只发收藏表情（`emoji_id`，走 SnowLuma 的 `send_custom_face`），不再支持系统表情编号。正式发之前先传 `preview=true`：只返回这一张表情图、不发送，确认合适再真发；这样列表阶段不用给模型灌图。带 `text` 时先发文字再发表情。群聊传 `group_id`，私聊传 `user_id`（可选 `group_id` 表示临时会话来源群）。
 - `qq_favorite_face`：
   - `file` 传 `http(s)` 链接、`base64://`、本机路径或 `data:image/...`，收藏一张新表情；
   - `message_id` + `index` 直接从聊天消息里的图片收藏（群记录里的 `[图片#0]` / `[表情包#0]` 就是索引）；
@@ -100,7 +100,9 @@ test/smoke.mjs                   离线冒烟测试：假 OneBot HTTP 服务 + �
   - `emoji_id` + `move_to_front` 移到收藏夹最前。
 - 聊天记录里的 `#编号` 是 `message_id`，可以用 `qq_send_face` 的 `reply_to` 回复，也可以配合 `qq_favorite_face` 收藏消息里的图片。
 
-这些自定义表情接口是 SnowLuma 扩展，NapCat 没有。用 NapCat 时系统表情照常能发，收藏表情工具会提示接口不可用。
+主动行为写进了唤醒提示词（@ 提醒、群后续、戳一戳、私聊）：模型约有 25% 的概率主动回一个收藏表情（先看备注挑、再 `preview=true` 看一张图、最后正式发）；收到带图片/表情包的消息时，也约有 25% 的概率用 `qq_favorite_face(message_id, index, desc)` 顺手收藏，`desc` 直接简短描述画面内容（如「闭眼安详」「锅铲敲地」「穿冬装的肥鱼」），否则以后只有备注可看、不知道用哪张。概率由模型按提示词自行把握，代码里不掷骰子。
+
+这些自定义表情接口是 SnowLuma 扩展，NapCat 没有。用 NapCat 时收藏表情工具会提示接口不可用。
 
 ## 群消息：引用和 @
 
@@ -223,7 +225,7 @@ Node.js 要求为 `>=22`，DSH 支持范围为 `0.2.x`，与原有依赖说明�
 
 - DSH 0.2.x（cordis 插件体系）
 - Node.js 22+（内置 `fetch` / `WebSocket`）
-- SnowLuma 提供 OneBot 11 HTTP 接口和 WebSocket 事件。系统表情、群聊和私聊 NapCat 也能用；收藏表情、更改头像、好友分组/备注/申请和 QQ 空间依赖 SnowLuma 的扩展接口，NapCat 上不保证可用。
+- SnowLuma 提供 OneBot 11 HTTP 接口和 WebSocket 事件。群聊和私聊 NapCat 也能用；发表情、收藏表情、更改头像、好友分组/备注/申请和 QQ 空间依赖 SnowLuma 的扩展接口，NapCat 上不保证可用。
 - 可选：`sharp`（GIF 拆帧、尺寸被拒时的兜底重编码）。会从 `SHARP_PATH`、插件自己的 `node_modules`、DSH 宿主 runtimeDir（桌面版通过 `process.argv[2]` 传入）等位置自动查找；找不到时 GIF 交给 DSH 显示首帧，大图仍由 DSH 自动归一化（默认单张源图上限 20MiB），图片不会因此丢失。
 
 改完代码可以跑 `npm test`：它会起一个假 OneBot HTTP 服务、用临时 `DSH_HOME` 加载工具，检查头像、好友管理、好友申请和 QQ 空间的请求体与校验，不连真实 QQ，也不碰 `~/.dsh/qq-tools-config.json`。
