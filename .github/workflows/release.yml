@@ -37,7 +37,7 @@ jobs:
           if [ -n "$prev" ]; then range="$prev..$GITHUB_REF_NAME"; else range="$GITHUB_REF_NAME"; fi
 
           cat > notes.md <<'EOF'
-          QQ group/private chat tools for DSH (OneBot 11 / SnowLuma).
+          QQ group/private chat tools for DSH. Requires SnowLuma; other OneBot implementations (including NapCat) are not supported.
 
           ## Install
 

@@ -1,6 +1,6 @@
 # dsh-qq-tools
 
-给 DSH（DeepSeek Harness）里的大肥鱼会话用的 QQ 群/私聊工具，走 OneBot 11 HTTP + WebSocket。发表情只发 QQ 收藏夹里的自定义表情；收藏表情、更改头像、好友管理和 QQ 空间走 SnowLuma 的扩展接口，和 QQ 客户端里的数据是同一份。
+给 DSH（DeepSeek Harness）里的大肥鱼会话用的 QQ 群/私聊工具。**只支持 SnowLuma**（通过它的 OneBot 11 HTTP + WebSocket 接口），NapCat 或其他 OneBot 实现都不支持。发表情只发 QQ 收藏夹里的自定义表情；收藏表情、更改头像、好友管理和 QQ 空间走 SnowLuma 的扩展接口，和 QQ 客户端里的数据是同一份。
 
 11 个工具组各自是一个独立的 cordis 组件，外加一个负责选择挂载会话的设置组件，在 DSH 插件页的「包含的组件」里可以逐个开关：
 
@@ -25,7 +25,7 @@
 
 ```
 cordis.patch.yml                 12 个组件行
-lib/shared.js                    共享核心：配置、OneBot、挂载、@ 轮询、私聊唤醒、戳一戳、表情、头像、好友管理、QQ 空间、观察窗
+lib/shared.js                    共享核心：配置、SnowLuma 接口、挂载、@ 轮询、私聊唤醒、戳一戳、表情、头像、好友管理、QQ 空间、观察窗
 lib/client.js                    浏览器半侧：插件页里的挂载会话下拉框
 lib/index.js                     包根 carrier（承载浏览器半侧和挂载会话接口），也是旧的全量入口
 locale/                          包根行在插件页显示的标题和说明
@@ -80,7 +80,7 @@ test/smoke.mjs                   离线冒烟测试：假 OneBot HTTP 服务 + �
 }
 ```
 
-- `napCat` 是 OneBot 11 HTTP 地址（SnowLuma 默认 `http://127.0.0.1:3000`，NapCat 也一样）；`wsUrl` 是 WebSocket 事件地址（默认 `ws://127.0.0.1:3001`）。
+- `napCat` 是 SnowLuma 的 OneBot 11 HTTP 地址（默认 `http://127.0.0.1:3000`；字段名沿用 `napCat`，但只填 SnowLuma，不支持 NapCat 或其他 OneBot 实现）；`wsUrl` 是 SnowLuma 的 WebSocket 事件地址（默认 `ws://127.0.0.1:3001`）。
 - `targetSession` 是目标会话 ID；可以在插件页「挂载会话 → 配置」里下拉选择，也可以直接改这个文件；留空时工具不会挂到任何会话。
 - `groups` 是允许看/发的群；空数组表示不限制。
 - `mentionEnabled` / `pokeEnabled` / `privateEnabled` 分别是 @ 轮询、戳一戳事件、私聊唤醒的总闸，对应组件关掉时它们也不会运行。
@@ -102,7 +102,7 @@ test/smoke.mjs                   离线冒烟测试：假 OneBot HTTP 服务 + �
 
 主动行为写进了唤醒提示词（@ 提醒、群后续、戳一戳、私聊）：模型约有 25% 的概率主动回一个收藏表情（先看备注挑、再 `preview=true` 看一张图、最后正式发）；收到带图片/表情包的消息时，也约有 25% 的概率用 `qq_favorite_face(message_id, index, desc)` 顺手收藏，`desc` 直接简短描述画面内容（如「闭眼安详」「锅铲敲地」「穿冬装的肥鱼」），否则以后只有备注可看、不知道用哪张。概率由模型按提示词自行把握，代码里不掷骰子。
 
-这些自定义表情接口是 SnowLuma 扩展，NapCat 没有。用 NapCat 时收藏表情工具会提示接口不可用。
+本插件只支持 SnowLuma；这些自定义表情接口是它的扩展，NapCat 等其他 OneBot 实现没有。
 
 ## 群消息：引用和 @
 
@@ -166,7 +166,7 @@ QQ空间组件提供 4 个工具，走 SnowLuma 的「空间」扩展：
   - `set_right`：改自己空间一条说说的可见范围，参数和发说说时的 `visibility` 一致；
   - `ban` / `unban`：拉黑或解除拉黑某人的空间访问（修改的是你自己空间的黑名单）。
 
-这些接口是 SnowLuma 的扩展，NapCat 上不一定都有；接口不可用时工具会返回 OneBot 的错误原文，不会影响群聊/私聊工具。
+这些接口是 SnowLuma 的扩展（本插件只支持 SnowLuma，NapCat 等其他 OneBot 实现没有这些接口）；接口不可用时工具会返回 SnowLuma 的错误原文，不会影响群聊/私聊工具。
 
 ## 安装
 
@@ -219,13 +219,13 @@ Node.js 要求为 `>=22`，DSH 支持范围为 `0.2.x`，与原有依赖说明�
 
 本次声明依据、已获得的安装证据及未验证项见 [整改记录](docs/verification/README.md)。用户已自行测试现有功能；本次不重复功能测试，也不将手工使用情况冒充完整的商城生命周期验收。
 
-本插件需要文件、网络和 OneBot token 权限。配置/诊断日志、本地图片读取、外部服务、账号写操作及失败边界详见 [SECURITY.md](SECURITY.md)。这些能力是 QQ 桥接的实际需要；补齐声明和验收证据不保证 DSH STORE 自动批准，商城可能仍要求 `user-reviewed` 专项审阅或保持 `blocked`。本仓库的验收记录不构成独立安全审计。
+本插件需要文件、网络和 SnowLuma 的 OneBot token 权限。配置/诊断日志、本地图片读取、外部服务、账号写操作及失败边界详见 [SECURITY.md](SECURITY.md)。这些能力是 QQ 桥接的实际需要；补齐声明和验收证据不保证 DSH STORE 自动批准，商城可能仍要求 `user-reviewed` 专项审阅或保持 `blocked`。本仓库的验收记录不构成独立安全审计。
 
 ## 依赖
 
 - DSH 0.2.x（cordis 插件体系）
 - Node.js 22+（内置 `fetch` / `WebSocket`）
-- SnowLuma 提供 OneBot 11 HTTP 接口和 WebSocket 事件。群聊和私聊 NapCat 也能用；发表情、收藏表情、更改头像、好友分组/备注/申请和 QQ 空间依赖 SnowLuma 的扩展接口，NapCat 上不保证可用。
+- SnowLuma 提供 OneBot 11 HTTP 接口和 WebSocket 事件，本插件只支持 SnowLuma；NapCat 或其他 OneBot 实现不支持。发表情、收藏表情、更改头像、好友分组/备注/申请和 QQ 空间都依赖 SnowLuma 的扩展接口。
 - 可选：`sharp`（GIF 拆帧、尺寸被拒时的兜底重编码）。会从 `SHARP_PATH`、插件自己的 `node_modules`、DSH 宿主 runtimeDir（桌面版通过 `process.argv[2]` 传入）等位置自动查找；找不到时 GIF 交给 DSH 显示首帧，大图仍由 DSH 自动归一化（默认单张源图上限 20MiB），图片不会因此丢失。
 
 改完代码可以跑 `npm test`：它会起一个假 OneBot HTTP 服务、用临时 `DSH_HOME` 加载工具，检查头像、好友管理、好友申请和 QQ 空间的请求体与校验，不连真实 QQ，也不碰 `~/.dsh/qq-tools-config.json`。
