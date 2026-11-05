@@ -513,5 +513,45 @@ const manage = mod.makeManageQzoneTool()
   render(manage, {}, b)
 }
 
+// 20. 群唤醒带图：@ 提醒 / 群后续把图片和表情包（mface）一起送进会话
+{
+  const img = (file) => ({ type: 'image', data: { file, url: 'https://example.com/' + file } })
+  const mface = (id) => ({ type: 'mface', data: { emojiId: id } })
+  const items = [
+    { gid: '1', group: '测试群', sender: '阿猫', user_id: '10001', message_id: 41, text: '[图片#0]', segs: [img('a.jpg')] },
+    { gid: '1', group: '测试群', sender: '阿狗', user_id: '10002', message_id: 42, text: '[图片#0]', segs: [img('b.jpg'), mface('e1')] },
+    { gid: '1', group: '测试群', sender: '阿狗', user_id: '10002', message_id: 43, text: '[图片#0][表情包#1]', segs: [img('c.jpg'), mface('e2'), img('d.jpg')] },
+  ]
+  const picked = mod.pickPushImages(items)
+  assert.equal(picked.length, 4)
+  // 动图（mface）优先且最多 2 张，其余名额给最近的静图
+  assert.deepEqual(picked.slice(0, 2).map((x) => x.seg.type), ['mface', 'mface'])
+  assert.equal(picked.filter((x) => x.seg.type === 'image').length, 2)
+
+  const asked = []
+  const admit = async (list) => {
+    asked.push(...list)
+    return list.map((x, i) => ({
+      caption: x.caption,
+      block: { type: 'image', data: 'AA', mediaType: 'image/jpeg', name: 'n' + i },
+    }))
+  }
+  const content = await mod.buildGroupPush(admit, {}, items, '【群聊 @ 提醒】有人 @ 了你：')
+  assert.equal(content[0].type, 'text')
+  assert.equal(asked.length, 4)
+  assert.equal(content.filter((b) => b.type === 'image').length, 4)
+  assert.equal(content.filter((b) => b.type === 'text').length, 5)
+  assert.match(asked[0].caption, /测试群/)
+  assert.ok(asked.some((x) => /表情包/.test(x.caption)))
+
+  // 没有附件层（组件没装 attachments）时退回纯文字，唤醒本身不受影响
+  const plain = await mod.buildGroupPush(undefined, {}, items, '只有字')
+  assert.equal(plain.length, 1)
+
+  // 没有图的消息不额外发附件层调用
+  const noImage = await mod.buildGroupPush(admit, {}, [{ gid: '1', segs: [{ type: 'text', data: { text: 'hi' } }], message_id: 44 }], '纯文字')
+  assert.equal(noImage.length, 1)
+}
+
 server.close()
 console.log('ALL SMOKE TESTS PASSED (' + calls.length + ' OneBot calls)')
