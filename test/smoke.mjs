@@ -523,10 +523,13 @@ const manage = mod.makeManageQzoneTool()
     { gid: '1', group: '测试群', sender: '阿狗', user_id: '10002', message_id: 43, text: '[图片#0][表情包#1]', segs: [img('c.jpg'), mface('e2'), img('d.jpg')] },
   ]
   const picked = mod.pickPushImages(items)
-  assert.equal(picked.length, 4)
-  // 动图（mface）优先且最多 2 张，其余名额给最近的静图
+  assert.equal(picked.length, 6)
+  // 动图（mface）优先，其余名额给最近的静图
   assert.deepEqual(picked.slice(0, 2).map((x) => x.seg.type), ['mface', 'mface'])
-  assert.equal(picked.filter((x) => x.seg.type === 'image').length, 2)
+  assert.equal(picked.filter((x) => x.seg.type === 'image').length, 4)
+  // 上限 10 张，和聊天记录一致
+  const many = [{ gid: '1', segs: Array.from({ length: 12 }, (_, i) => img('m' + i + '.jpg')) }]
+  assert.equal(mod.pickPushImages(many).length, 10)
 
   const asked = []
   const admit = async (list) => {
@@ -538,9 +541,9 @@ const manage = mod.makeManageQzoneTool()
   }
   const content = await mod.buildGroupPush(admit, {}, items, '【群聊 @ 提醒】有人 @ 了你：')
   assert.equal(content[0].type, 'text')
-  assert.equal(asked.length, 4)
-  assert.equal(content.filter((b) => b.type === 'image').length, 4)
-  assert.equal(content.filter((b) => b.type === 'text').length, 5)
+  assert.equal(asked.length, 6)
+  assert.equal(content.filter((b) => b.type === 'image').length, 6)
+  assert.equal(content.filter((b) => b.type === 'text').length, 7)
   assert.match(asked[0].caption, /测试群/)
   assert.ok(asked.some((x) => /表情包/.test(x.caption)))
 
