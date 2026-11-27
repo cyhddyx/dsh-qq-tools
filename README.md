@@ -75,6 +75,8 @@ test/smoke.mjs                   离线冒烟测试：假 OneBot HTTP 服务 + �
 {
   "napCat": "http://127.0.0.1:3000",
   "accessToken": "",
+  "httpToken": "",
+  "wsToken": "",
   "targetSession": "",
   "groups": [],
   "historyCount": 30,
@@ -84,16 +86,18 @@ test/smoke.mjs                   离线冒烟测试：假 OneBot HTTP 服务 + �
   "wsUrl": "ws://127.0.0.1:3001",
   "pokeEnabled": true,
   "privateEnabled": true,
+  "friendRequestEnabled": true,
   "privateUsers": [],
   "observationMs": 60000,
   "timeoutMs": 6000
 }
 ```
 
-- `napCat` 是 SnowLuma 的 OneBot 11 HTTP 地址（默认 `http://127.0.0.1:3000`；字段名沿用 `napCat`，但只填 SnowLuma，不支持 NapCat 或其他 OneBot 实现）；`wsUrl` 是 SnowLuma 的 WebSocket 事件地址（默认 `ws://127.0.0.1:3001`）。
+- `napCat` 是 SnowLuma 的 OneBot 11 HTTP 地址（默认 `http://127.0.0.1:3000`；字段名沿用 `napCat`，但只填 SnowLuma，不支持 NapCat 或其他 OneBot 实现）；`wsUrl` 是 SnowLuma 的 WebSocket 事件地址（默认 `ws://127.0.0.1:3001`）。将 `wsUrl` 设为 `""` 并重启插件可关闭所有 WebSocket 监听。
+- `httpToken` 和 `wsToken` 分别用于 HTTP 和 WebSocket 鉴权。任一字段省略或留空时，对应连接沿用 `accessToken`。
 - `targetSession` 是目标会话 ID；可以在插件页「挂载会话 → 配置」里下拉选择，也可以直接改这个文件；留空时工具不会挂到任何会话。
 - `groups` 是允许看/发的群；空数组表示不限制。
-- `mentionEnabled` / `pokeEnabled` / `privateEnabled` 分别是 @ 轮询、戳一戳事件、私聊唤醒的总闸，对应组件关掉时它们也不会运行。
+- `mentionEnabled` / `pokeEnabled` / `privateEnabled` / `friendRequestEnabled` 分别控制 @ 轮询、戳一戳事件、私聊唤醒和普通好友申请监听。将 `friendRequestEnabled` 设为 `false` 并重启插件可单独关闭普通好友申请监听。
 - `privateUsers` 是允许唤醒和私聊工具的 QQ 白名单；空数组表示不限制。非空时，不在列表里的私聊消息不会唤醒，`qq_list_friends` 也不会列出他们；好友资料/备注/分组/删好友/名片赞和查看别人的 QQ 空间也只对名单里的 QQ 生效。好友申请的处理不受这条限制，否则新申请人永远进不来。
 
 ## 表情
